@@ -1,0 +1,38 @@
+## Guide to using KKNN MAchine Learning Algorithm in R on a credit card data from Georgia Tech univ Analytics Course
+###load data
+
+data= read.table('credit_card_data.txt', header = F)
+data=factor(data[,11])
+library(kknn)
+library(caTools)
+set.seed(1234)
+split = sample.split(data[1:654,1:11], SplitRatio = 0.8)
+training_set = subset(data, split == TRUE)
+test_set = subset(data, split == FALSE)
+
+#to check no of clusters
+x= specClust(training_set, centers = NULL, nn=10, method = "symmetric", gmax = NULL)
+summary(x)
+
+plot(x)
+
+# training the model
+?train.kknn
+model_test= train.kknn(training_set$V11 ~., training_set,kmax = 25, kernel = c("optimal", "rectangular","triangular"), scale = T, distance =5)
+plot(model)
+
+## for test data set
+train.kknn= kknn(training_set$V11 ~., train =training_set, test = test_set, k=12, kernel = "rectangular"
+                 , scale = T)
+
+fit= fitted.values(train.kknn)
+plot(fit)
+
+##misclassification table
+train_labels= training_set[,11]
+test_labels=factor(test_set[,11])
+library(gmodels)
+CrossTable(x=test_labels, y= fit)
+
+
+
